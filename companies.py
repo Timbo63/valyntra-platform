@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.models.models import Company
-from app.schemas.schemas import CompanyCreate, CompanyOut
-from app.core.security import get_current_user
+from db.session import get_db
+from models import Company
+from schemas import CompanyCreate, CompanyOut
+from security import get_current_user
 
 router = APIRouter(prefix="/api/companies", tags=["companies"])
 
