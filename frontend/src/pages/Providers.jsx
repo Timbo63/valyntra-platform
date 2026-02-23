@@ -100,4 +100,33 @@ export default function Providers() {
             {user?.is_admin && (
               <button onClick={() => handleDelete(p.id)} style={{ position:'absolute', top:12, right:12, background:'none', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:16 }}>✕</button>
             )}
-            <div style={{ fontFamily:'Syne', fontWeight:800, fontSize:16, marginBottom:4 }}>
+            <div style={{ fontFamily:'Syne', fontWeight:800, fontSize:16, marginBottom:4 }}>{p.name}</div>
+            <div style={{ fontSize:12, color:'var(--muted)', marginBottom:14 }}>{p.provider_type}</div>
+            {p.capability_tags?.length > 0 && (
+              <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:12 }}>
+                {p.capability_tags.map(tag => (
+                  <span key={tag} className="badge badge-blue">{tag}</span>
+                ))}
+              </div>
+            )}
+            <div style={{ fontSize:13, color:'var(--muted)', display:'flex', flexDirection:'column', gap:5 }}>
+              {p.delivery_model && <span>📡 {p.delivery_model}</span>}
+              {p.typical_project_size && <span>📦 {p.typical_project_size}</span>}
+              {p.capacity && <span>⚡ Capacity: {p.capacity}</span>}
+              {p.qualification_score && (
+                <span>Score: <strong style={{ color:'var(--blue)' }}>{p.qualification_score}/30</strong></span>
+              )}
+            </div>
+            {p.website && (
+              <a href={p.website} target="_blank" rel="noreferrer" style={{ display:'inline-block', marginTop:14, fontSize:13, color:'var(--blue)', fontWeight:600 }}>
+                Visit website →
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const L = { fontSize: 13, fontWeight: 600, color: 'var(--muted)', display: 'block', marginBottom: 6 }
