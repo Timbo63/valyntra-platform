@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.models.models import Assessment, Company
-from app.schemas.schemas import AssessmentCreate, AssessmentOut
-from app.core.security import get_current_user
-from app.services.scoring import calculate_score
-from app.services.opportunity_engine import generate_opportunities
-from app.services.matching import run_matching
+from db.session import get_db
+from models import Assessment, Company
+from schemas import AssessmentCreate, AssessmentOut
+from security import get_current_user
+from scoring import calculate_score
+from opportunity_engine import generate_opportunities
+from matching import run_matching
 
 router = APIRouter(prefix="/api/assessments", tags=["assessments"])
 
@@ -17,7 +17,6 @@ def submit_assessment(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    # Validate company ownership
     company = db.query(Company).filter(
         Company.id == payload.company_id,
         Company.owner_id == current_user.id,
@@ -25,19 +24,16 @@ def submit_assessment(
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
 
-    # Validate 1-5 inputs
     for field in ["data_maturity", "process_automation", "leadership_alignment", "technical_infrastructure"]:
         val = getattr(payload, field)
         if not (1 <= val <= 5):
             raise HTTPException(status_code=422, detail=f"{field} must be between 1 and 5")
 
-    # Save assessment
     assessment = Assessment(**payload.model_dump())
     db.add(assessment)
     db.commit()
     db.refresh(assessment)
 
-    # Run full pipeline: score → opportunities → matches
     score = calculate_score(assessment, db)
     opportunities = generate_opportunities(company, score, db)
     run_matching(company, opportunities, db)
