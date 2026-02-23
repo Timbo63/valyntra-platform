@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import traceback
 from session import Base, engine
 from auth import router as auth_router
 from companies import router as companies_router
@@ -9,13 +11,22 @@ from routes import (
     matches_router, dashboard_router,
 )
 
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+    print("✅ Database tables created successfully")
+except Exception as e:
+    print(f"❌ Database error: {e}")
 
 app = FastAPI(
     title="Valyntra Platform API",
     description="AI Adoption & Operational Intelligence Platform",
     version="1.0.0",
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    print(f"❌ Unhandled error: {traceback.format_exc()}")
+    return JSONResponse(status_code=500, content={"detail": str(exc), "trace": traceback.format_exc()})
 
 app.add_middleware(
     CORSMiddleware,
