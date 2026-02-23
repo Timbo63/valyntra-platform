@@ -1,0 +1,68 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #0A0F1E;
+  --blue-deep: #0B1F3A;
+  --blue-mid: #1E3A8A;
+  --blue: #2563EB;
+  --blue-light: #60A5FA;
+  --cream: #F8F6F1;
+  --white: #fff;
+  --muted: #6B7280;
+  --border: #E5E7EB;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --radius: 12px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4 { font-family: 'Syne', sans-serif; font-weight: 800; line-height: 1.1; }
+
+a { color: var(--blue); text-decoration: none; }
+
+button { cursor: pointer; font-family: inherit; }
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: 15px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--blue); }
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.badge-blue    { background: rgba(37,99,235,0.1); color: var(--blue); }
+.badge-green   { background: rgba(16,185,129,0.1); color: var(--success); }
+.badge-yellow  { background: rgba(245,158,11,0.1); color: var(--warning); }
+.badge-red     { background: rgba(239,68,68,0.1); color: var(--danger); }
+
+.btn {
+  display: inline-flex;
+  align-items:
