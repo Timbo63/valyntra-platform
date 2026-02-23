@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from db.session import get_db
+from session import get_db
 from models import Company
 from schemas import CompanyCreate, CompanyOut
 from security import get_current_user
