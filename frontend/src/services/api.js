@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-const api = axios.create({ baseURL: '/api' })
+const api = axios.create({ 
+  baseURL: import.meta.env.VITE_API_URL || 'https://valyntra-api.onrender.com'
+})
 
 api.interceptors.request.use(cfg => {
   const token = localStorage.getItem('token')
@@ -8,27 +10,25 @@ api.interceptors.request.use(cfg => {
   return cfg
 })
 
-export const register  = (data) => api.post('/auth/register', data)
-export const login     = (data) => api.post('/auth/login', data)
-export const getMe     = ()     => api.get('/auth/me')
+export const register  = (data) => api.post('/api/auth/register', data)
+export const login     = (data) => api.post('/api/auth/login', data)
+export const getMe     = ()     => api.get('/api/auth/me')
 
-export const createCompany  = (data) => api.post('/companies', data)
-export const listCompanies  = ()     => api.get('/companies')
-export const getCompany     = (id)   => api.get(`/companies/${id}`)
+export const createCompany  = (data) => api.post('/api/companies', data)
+export const listCompanies  = ()     => api.get('/api/companies')
+export const getCompany     = (id)   => api.get(`/api/companies/${id}`)
 
-export const submitAssessment     = (data) => api.post('/assessments', data)
-export const getAssessments       = (cid)  => api.get(`/assessments/company/${cid}`)
+export const submitAssessment = (data) => api.post('/api/assessments', data)
+export const getAssessments   = (cid)  => api.get(`/api/assessments/company/${cid}`)
 
-export const getScore             = (cid)  => api.get(`/scores/${cid}`)
+export const getScore         = (cid)  => api.get(`/api/scores/${cid}`)
+export const getOpportunities = (cid)  => api.get(`/api/opportunities/${cid}`)
 
-export const getOpportunities     = (cid)  => api.get(`/opportunities/${cid}`)
+export const listProviders    = ()     => api.get('/api/providers')
+export const createProvider   = (data) => api.post('/api/providers', data)
+export const deleteProvider   = (id)   => api.delete(`/api/providers/${id}`)
 
-export const listProviders        = ()     => api.get('/providers')
-export const createProvider       = (data) => api.post('/providers', data)
-export const deleteProvider       = (id)   => api.delete(`/providers/${id}`)
-
-export const getMatches           = (cid)  => api.get(`/matches/${cid}`)
-
-export const getDashboard         = (cid)  => api.get(`/dashboard/${cid}`)
+export const getMatches       = (cid)  => api.get(`/api/matches/${cid}`)
+export const getDashboard     = (cid)  => api.get(`/api/dashboard/${cid}`)
 
 export default api
