@@ -64,4 +64,137 @@ export default function Assessment() {
     <div className="page" style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'80vh' }}>
       <div style={{ textAlign:'center', maxWidth:480 }}>
         <div style={{ fontSize:56, marginBottom:16 }}>✓</div>
-        <h2 style={{ fontSize:28, marginBottom:12 }}>Assessment Complete
+        <h2 style={{ fontSize:28, marginBottom:12 }}>Assessment Complete</h2>
+        <p style={{ color:'var(--muted)', marginBottom:28 }}>Your AI readiness score, opportunities, and provider matches are ready.</p>
+        <button className="btn btn-primary" onClick={() => navigate('/')}>View Dashboard</button>
+      </div>
+    </div>
+  )
+
+  const q = step >= 1 && step <= 4 ? QUESTIONS[step - 1] : null
+
+  return (
+    <div className="page" style={{ maxWidth: 680 }}>
+      <h1 className="page-title">AI Readiness Assessment</h1>
+      <p className="page-sub">Answer 4 questions to receive your score, opportunities, and matched providers.</p>
+      <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, marginBottom: 36 }}>
+        <div style={{ height: '100%', width: `${progress}%`, background: 'var(--blue)', borderRadius: 2, transition: 'width 0.4s' }} />
+      </div>
+      <div className="card">
+        {step === 0 && (
+          <>
+            <h3 style={{ fontSize: 20, marginBottom: 20 }}>Your Company</h3>
+            {companies.length > 0 && !isNew && (
+              <>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={L}>Select existing company</label>
+                  <select value={companyId || ''} onChange={e => setCompanyId(parseInt(e.target.value))}>
+                    <option value="">— Choose —</option>
+                    {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+                <p style={{ textAlign:'center', color:'var(--muted)', fontSize:14, margin:'16px 0' }}>or</p>
+              </>
+            )}
+            <button className="btn btn-secondary" style={{ marginBottom: 20 }} onClick={() => setIsNew(!isNew)}>
+              {isNew ? '← Use existing company' : '+ Add new company'}
+            </button>
+            {isNew && (
+              <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+                <div><label style={L}>Company Name *</label><input value={company.name} onChange={e=>setCompany({...company,name:e.target.value})} placeholder="Acme Corp" /></div>
+                <div><label style={L}>Industry</label>
+                  <select value={company.industry} onChange={e=>setCompany({...company,industry:e.target.value})}>
+                    <option value="">— Select —</option>
+                    {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
+                  </select>
+                </div>
+                <div className="grid-2">
+                  <div><label style={L}>County</label><input value={company.county} onChange={e=>setCompany({...company,county:e.target.value})} placeholder="Broward" /></div>
+                  <div><label style={L}>Employees</label><input type="number" value={company.employee_count} onChange={e=>setCompany({...company,employee_count:e.target.value})} placeholder="250" /></div>
+                </div>
+                <div><label style={L}>Primary Business Function</label><input value={company.primary_function} onChange={e=>setCompany({...company,primary_function:e.target.value})} placeholder="Operations, Sales, etc." /></div>
+              </div>
+            )}
+            {error && <p className="error-msg" style={{marginTop:12}}>{error}</p>}
+            <button className="btn btn-primary" style={{ marginTop:24, width:'100%', justifyContent:'center' }} onClick={handleCompanyNext} disabled={loading}>
+              {loading ? 'Saving...' : 'Continue →'}
+            </button>
+          </>
+        )}
+        {q && (
+          <>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>
+              Question {step} of 4
+            </div>
+            <h3 style={{ fontSize: 22, marginBottom: 8 }}>{q.label}</h3>
+            <p style={{ color: 'var(--muted)', fontSize: 15, marginBottom: 28 }}>{q.desc}</p>
+            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              {q.options.map((opt, i) => (
+                <button key={i} onClick={() => setAnswers({...answers, [q.key]: i+1})}
+                  style={{
+                    padding: '14px 18px', borderRadius: 8, border: `2px solid ${answers[q.key] === i+1 ? 'var(--blue)' : 'var(--border)'}`,
+                    background: answers[q.key] === i+1 ? 'rgba(37,99,235,0.06)' : 'white',
+                    textAlign:'left', fontSize:14, fontWeight: answers[q.key] === i+1 ? 600 : 400,
+                    color: answers[q.key] === i+1 ? 'var(--blue)' : 'var(--ink)',
+                    cursor:'pointer', transition:'all 0.15s',
+                  }}>
+                  {opt}
+                </button>
+              ))}
+            </div>
+            <div style={{ display:'flex', gap:12, marginTop:24 }}>
+              <button className="btn btn-secondary" onClick={() => setStep(step-1)}>← Back</button>
+              <button className="btn btn-primary" style={{ flex:1, justifyContent:'center' }}
+                onClick={() => { if (!answers[q.key]) { setError('Please select an answer'); return; } setError(''); setStep(step+1) }}>
+                {step === 4 ? 'Final Details →' : 'Next →'}
+              </button>
+            </div>
+            {error && <p className="error-msg" style={{marginTop:8}}>{error}</p>}
+          </>
+        )}
+        {step === 5 && (
+          <>
+            <h3 style={{ fontSize: 20, marginBottom: 20 }}>Final Details <span style={{fontWeight:300,color:'var(--muted)'}}>(optional)</span></h3>
+            <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+              <div>
+                <label style={L}>Primary operational pain point</label>
+                <textarea rows={3} value={details.primary_pain} onChange={e=>setDetails({...details,primary_pain:e.target.value})} placeholder="e.g. Manual scheduling across 6 locations consuming 30% of staff time" style={{resize:'vertical'}} />
+              </div>
+              <div>
+                <label style={L}>Current tools in use</label>
+                <input value={details.current_tools} onChange={e=>setDetails({...details,current_tools:e.target.value})} placeholder="e.g. Salesforce, QuickBooks, spreadsheets" />
+              </div>
+              <div className="grid-2">
+                <div>
+                  <label style={L}>Budget range</label>
+                  <select value={details.budget_range} onChange={e=>setDetails({...details,budget_range:e.target.value})}>
+                    <option value="">— Select —</option>
+                    <option>Under $25K</option><option>$25K – $100K</option>
+                    <option>$100K – $500K</option><option>$500K+</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={L}>Implementation timeline</label>
+                  <select value={details.timeline} onChange={e=>setDetails({...details,timeline:e.target.value})}>
+                    <option value="">— Select —</option>
+                    <option>0–3 months</option><option>3–6 months</option>
+                    <option>6–12 months</option><option>12+ months</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            {error && <p className="error-msg" style={{marginTop:12}}>{error}</p>}
+            <div style={{ display:'flex', gap:12, marginTop:24 }}>
+              <button className="btn btn-secondary" onClick={() => setStep(4)}>← Back</button>
+              <button className="btn btn-primary" style={{ flex:1, justifyContent:'center' }} onClick={handleSubmit} disabled={loading}>
+                {loading ? 'Processing...' : 'Submit & Generate Results'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const L = { fontSize: 13, fontWeight: 600, color: 'var(--muted)', display: 'block', marginBottom: 6 }
