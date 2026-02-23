@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.models.models import Score, Opportunity, Provider, Match, Company
-from app.schemas.schemas import ScoreOut, OpportunityOut, ProviderOut, ProviderCreate, MatchOut, DashboardOut
-from app.core.security import get_current_user, get_current_admin
+from db.session import get_db
+from models import Score, Opportunity, Provider, Match, Company
+from schemas import ScoreOut, OpportunityOut, ProviderOut, ProviderCreate, MatchOut, DashboardOut
+from security import get_current_user, get_current_admin
 
 # ── Scores ───────────────────────────────────────────────────────────────
 scores_router = APIRouter(prefix="/api/scores", tags=["scores"])
