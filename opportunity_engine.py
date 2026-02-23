@@ -1,12 +1,7 @@
-"""
-Valyntra Opportunity Recommendation Engine
-Rule-based: maps industry + score + pain to ranked AI use cases
-"""
 from sqlalchemy.orm import Session
-from app.models.models import Company, Score, Assessment, Opportunity
+from models import Company, Score, Opportunity
 
 
-# Use case library keyed by industry + tag
 USE_CASE_LIBRARY = {
     "Healthcare": [
         {"use_case": "Predictive Patient Scheduling", "tag": "optimization",
@@ -70,35 +65,29 @@ ROI_TO_SCORE    = {"Quick Win": 3, "Strategic": 2, "Long-Term": 1}
 
 
 def _rank_use_cases(use_cases: list, readiness_score: float) -> list:
-    """Rank by impact/effort ratio, boosting quick wins for lower-readiness orgs."""
     def _priority(uc):
-        effort  = EFFORT_TO_SCORE[uc["effort"]]
-        impact  = IMPACT_TO_SCORE[uc["impact"]]
-        roi     = ROI_TO_SCORE[uc["roi"]]
-        # Lower-readiness companies → prefer easier wins
+        effort = EFFORT_TO_SCORE[uc["effort"]]
+        impact = IMPACT_TO_SCORE[uc["impact"]]
+        roi    = ROI_TO_SCORE[uc["roi"]]
         effort_weight = 2.0 if readiness_score < 50 else 1.0
         return (impact * 1.5) + (effort * effort_weight) + roi
     return sorted(use_cases, key=_priority, reverse=True)
 
 
 def generate_opportunities(company: Company, score: Score, db: Session) -> list:
-    """Generate and persist ranked opportunities for a company."""
-
-    # Clear existing opportunities
     db.query(Opportunity).filter(Opportunity.company_id == company.id).delete()
     db.flush()
 
     industry = company.industry or "Default"
     use_cases = USE_CASE_LIBRARY.get(industry, USE_CASE_LIBRARY["Default"])
 
-    # Always add default cases if industry-specific list is short
     if len(use_cases) < 3:
         use_cases += USE_CASE_LIBRARY["Default"]
 
     ranked = _rank_use_cases(use_cases, score.overall_score)
 
     opportunities = []
-    for i, uc in enumerate(ranked[:5], start=1):  # top 5
+    for i, uc in enumerate(ranked[:5], start=1):
         opp = Opportunity(
             company_id=company.id,
             use_case=uc["use_case"],
